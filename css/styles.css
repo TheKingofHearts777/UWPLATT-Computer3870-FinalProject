@@ -90,14 +90,52 @@ h1 {
 }
 
 .pause-menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Poker Table Area */
+#table-area {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 20px;
+    width: 90%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.card {
+    display: inline-block;
+    width: 60px;
+    height: 90px;
+    background: white;
+    color: black;
+    border-radius: 8px;
+    border: 2px solid #222;
+    margin: 4px;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 90px;
+    text-align: center;
+}
+
+#controls {
+    display: flex;
+    justify-content: space-between, center;
+    align-items: center;
+    margin-top: 16px;
+    width: 100%;
+    max-width: 250px;
 }

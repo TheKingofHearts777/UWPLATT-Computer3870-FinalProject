@@ -4,15 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game</title>
+    <title>Poker Game</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
     <div id="game-area" class="start-game-body">
-        <button id="pause-btn" class="menu-btn" style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
-            Pause
-        </button>
+        <button id="pause-btn" class="menu-btn"
+            style="position:absolute; top:20px; left:20px; z-index:1000;">Pause</button>
+
+        <div id="table-area">
+            <h2 style="text-shadow: 2px 2px #000;">You vs Dealer</h2>
+            <div id="board"></div>
+
+            <h3>Your Hand</h3>
+            <div id="playerHand"></div>
+
+            <h3>Dealer</h3>
+            <div id="dealerHand"></div>
+
+            <div id="controls">
+                <button class="menu-btn" id="nextBtn">Next Phase</button>
+                <button class="menu-btn" id="foldBtn">Fold</button>
+            </div>
+
+            <p id="status"></p>
+        </div>
     </div>
 
     <div id="pause-overlay" class="pause-menu-overlay">
@@ -20,40 +37,11 @@
             <h2>Game Paused</h2>
             <button class="menu-btn" id="resume-btn">Resume Game</button>
             <button class="menu-btn" onclick="location.href='settings.html'">Settings</button>
-            <button class="menu-btn" onclick="location.href='main-menu.html'">Return to Main Menu</button>
+            <button class="menu-btn" onclick="location.href='index.html'">Return to Main Menu</button>
         </div>
     </div>
+
+    <script src="./poker-logic.js"> </script>
 </body>
-
-<script>
-    const pauseBtn = document.getElementById('pause-btn');
-    const resumeBtn = document.getElementById('resume-btn');
-    const pauseOverlay = document.getElementById('pause-overlay');
-    const gameArea = document.getElementById('game-area');
-
-    function pauseGame() {
-        gameArea.style.filter = 'blur(5px)';
-        pauseOverlay.style.display = 'flex';
-    }
-
-    function resumeGame() {
-        gameArea.style.filter = 'none';
-        pauseOverlay.style.display = 'none';
-    }
-
-    pauseBtn.addEventListener('click', pauseGame);
-    resumeBtn.addEventListener('click', resumeGame);
-
-    // Toggle with ESC key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === "Escape") {
-            if (pauseOverlay.style.display === "flex") {
-                resumeGame();
-            } else {
-                pauseGame();
-            }
-        }
-    });
-</script>
 
 </html>
