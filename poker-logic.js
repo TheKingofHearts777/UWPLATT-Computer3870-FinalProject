@@ -62,7 +62,7 @@ function renderCards(elemId, cards, hidden = false) {
         d.className = "card";
         if (hidden) {
             const img = document.createElement("img");
-            img.src = "../assets/card-back.jpg";
+            img.src = "./assets/card-back.jpg";
             img.alt = "Card Back";
             img.style.width = "100%";
             img.style.height = "100%";
