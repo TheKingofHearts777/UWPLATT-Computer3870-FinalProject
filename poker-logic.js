@@ -31,7 +31,7 @@ const gameStatus = document.getElementById('status');
 
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-let deck = [], player = [], dealer = [], board = [], phase = 0;
+let deck = [], player = [], computer = [], board = [], phase = 0;
 
 function makeDeck() {
     // Create a new deck with all combinations of ranks and suits
@@ -54,7 +54,13 @@ function burn() { deck.pop(); }
 
 function renderCards(elemId, cards, hidden = false) {
     nextPhaseBtn.textContent = "Next Phase";
-    if (phase === 4) nextPhaseBtn.textContent = "Deal Again";
+    if (phase === 4) {
+        nextPhaseBtn.textContent = "Deal Again";
+        foldBtn.style.display = "none";
+    }
+    else {
+        foldBtn.style.display = "inline-block";
+    }
     const div = document.getElementById(elemId);
     div.innerHTML = "";
     for (let c of cards) {
@@ -63,7 +69,7 @@ function renderCards(elemId, cards, hidden = false) {
         if (hidden) {
             const img = document.createElement("img");
             img.src = "assets/card-back.jpg";
-            img.alt = "Card Back";
+            img.alt = "Card_back";
             img.style.fontSize = "10px";
             img.style.width = "100%";
             img.style.height = "100%";
@@ -78,18 +84,18 @@ function renderCards(elemId, cards, hidden = false) {
 
 function deal() {
     makeDeck();
-    player = []; dealer = []; board = []; phase = 0;
-    for (let i = 0; i < 2; i++) { dealCard(player); dealCard(dealer); }
+    player = []; computer = []; board = []; phase = 0;
+    for (let i = 0; i < 2; i++) { dealCard(player); dealCard(computer); }
     document.getElementById("status").textContent = "Pre-Flop";
     renderCards("playerHand", player);
-    renderCards("dealerHand", dealer, true);
+    renderCards("computerHand", computer, true);
     gameBoard.innerHTML = "";
 }
 
 function fold() {
-    gameStatus.textContent = "You folded. Dealer wins!";
+    gameStatus.textContent = "You folded. Computer wins!";
     phase = 4;
-    renderCards("dealerHand", dealer, false);
+    renderCards("computerHand", computer, false);
     nextPhaseBtn.textContent = "Deal Again";
 }
 
@@ -98,7 +104,7 @@ function nextPhase() {
     else if (phase === 1) { burn(); dealCard(board); phase = 2; gameStatus.textContent = "Turn"; }
     else if (phase === 2) { burn(); dealCard(board); phase = 3; gameStatus.textContent = "River"; }
     else if (phase === 3) {
-        renderCards("dealerHand", dealer, false);
+        renderCards("computerHand", computer, false);
         gameStatus.textContent = "Showdown: " + compareHands();
         phase = 4;
     } else { deal(); }
@@ -112,11 +118,11 @@ function highCard(cards) {
 
 function compareHands() {
     const playerAll = [...player, ...board];
-    const dealerAll = [...dealer, ...board];
+    const computerAll = [...computer, ...board];
     const p = highCard(playerAll);
-    const d = highCard(dealerAll);
-    if (p > d) return "You win!";
-    if (p < d) return "Dealer wins!";
+    const c = highCard(computerAll);
+    if (p > c) return "You win!";
+    if (p < c) return "Computer wins!";
     return "It's a tie!";
 }
 
