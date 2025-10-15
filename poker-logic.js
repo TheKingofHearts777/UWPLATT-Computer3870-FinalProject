@@ -111,9 +111,28 @@ function nextPhase() {
     renderCards("board", board);
 }
 
-function rankValue(r) { return "23456789TJQKA".indexOf(r); }
+function rankValue(card) {
+    const valueMap = {
+        "2":    0,
+        "3":    1,
+        "4":    2,
+        "5":    3,
+        "6":    4,
+        "7":    5,
+        "8":    6,
+        "9":    7,
+        "10":   8,
+        "J":    9,
+        "Q":    10,
+        "K":    11,
+        "A":    12
+    };
+
+    return valueMap[card.slice(0, -1)];
+}
+
 function highCard(cards) {
-    return Math.max(...cards.map(c => rankValue(c[0])));
+    return Math.max(...cards.map(c => rankValue(c)));
 }
 
 function compareHands() {
