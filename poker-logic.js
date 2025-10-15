@@ -131,6 +131,10 @@ function rankValue(card) {
     return valueMap[card.slice(0, -1)];
 }
 
+function sortCardsByRank(cards) {
+    return cards.sort((a, b) => rankValue(a) - rankValue(b))
+}
+
 function highCard(cards) {
     return Math.max(...cards.map(c => rankValue(c)));
 }
