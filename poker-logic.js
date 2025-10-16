@@ -113,26 +113,235 @@ function nextPhase() {
 
 function rankValue(card) {
     const valueMap = {
-        "2":    0,
-        "3":    1,
-        "4":    2,
-        "5":    3,
-        "6":    4,
-        "7":    5,
-        "8":    6,
-        "9":    7,
-        "10":   8,
-        "J":    9,
-        "Q":    10,
-        "K":    11,
-        "A":    12
+        "2":    2,
+        "3":    3,
+        "4":    4,
+        "5":    5,
+        "6":    6,
+        "7":    7,
+        "8":    8,
+        "9":    9,
+        "10":   10,
+        "J":    11,
+        "Q":    12,
+        "K":    13,
+        "A":    14
     };
 
     return valueMap[card.slice(0, -1)];
 }
 
+function getSuit(card) {
+    return card.at(-1);
+}
+
 function sortCardsByRank(cards) {
     return cards.sort((a, b) => rankValue(a) - rankValue(b))
+}
+
+function getCombinations(cards) {
+    const results = [];
+
+    // Helper recursive function
+    function helper(start, combo) {
+        // Base case: if we’ve chosen 5 cards, store a copy
+        if (combo.length === 5) {
+            results.push([...combo]);
+            return;
+        }
+
+        // Try adding each remaining card
+        for (let i = start; i < cards.length; i++) {
+            combo.push(cards[i]);
+            helper(i + 1, combo);
+            combo.pop(); // backtrack
+        }
+    }
+
+    helper(0, []);
+    return results;
+}
+
+function checkFlush(cards) {
+    const suit = getSuit(cards[0]);
+
+    for (let i = 1; i < cards.length; i++) {
+        if (suit != getSuit(cards[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function checkAceLowStraight(cards) {
+    // Handle Ace-low straight (A-2-3-4-5)
+    const ranks = cards.map(c => rankValue(c));
+    const aceLowRanks = ranks.map(r => r === 14 ? 1 : r).sort((a, b) => a - b);
+    let isAceLowStraight = true;
+    for (let i = 1; i < aceLowRanks.length; i++) {
+        if (aceLowRanks[i] !== aceLowRanks[i - 1] + 1) {
+            isAceLowStraight = false;
+            break;
+        }
+    }
+    if (isAceLowStraight) return true;
+}
+
+function checkStraight(cards) {
+    // Handle Ace-low straight (A-2-3-4-5)
+    const ranks = cards.map(c => rankValue(c));
+    const aceLowRanks = ranks.map(r => r === 14 ? 1 : r).sort((a, b) => a - b);
+
+    let isAceLowStraight = true;
+
+    for (let i = 1; i < aceLowRanks.length; i++) {
+        if (aceLowRanks[i] !== aceLowRanks[i - 1] + 1) {
+            isAceLowStraight = false;
+            break;
+        }
+    }
+
+    if (isAceLowStraight) {
+        return true;
+    }
+
+    // Ensure cards are in rank order
+    // TODO: Handle Ace low which sorting does not allow for
+    const sortedCards = sortCardsByRank(cards);
+
+    let rank = rankValue(sortedCards[0]);
+
+    for (let i = 1; i < sortedCards.length; i++) {
+        // Does not account for ace low
+        if (rankValue(sortedCards[i]) != rank + 1) {
+            return false;
+        }
+
+        rank++;
+    }
+
+    return true;
+}
+
+function checkRoyalFlush(cards) {
+    return checkFlush(cards) && (rankValue(sortCardsByRank(cards)[0]) == rankValue("10*") && checkStraight(cards));
+}
+
+function checkStraightFlush(cards) {
+    return checkFlush(cards) && checkStraight(cards);
+}
+
+// TODO: Pass in result of findDuplicates(hand) to prevent calling it each for each function
+
+function checkFourOfAKind(cards) {
+    const rankCounts = findDuplicates(cards);
+    
+    // 4 of a kind will only have 1 set of duplicates as there is 1 card remaining
+    return Object.keys(rankCounts).length == 1 && rankCounts[Object.keys(rankCounts)[0]] == 4;
+}
+
+function checkFullHouse(cards) {
+    const rankCounts = findDuplicates(cards);
+
+    // Full House will only 2 ranks
+    return Object.keys(rankCounts).length == 2 && (
+        (rankCounts[Object.keys(rankCounts)[0]] == 3 && rankCounts[Object.keys(rankCounts)[1]] == 2) ||
+        (rankCounts[Object.keys(rankCounts)[0]] == 2 && rankCounts[Object.keys(rankCounts)[1]] == 3)
+    );
+}
+
+function checkThreeOfAKind(cards) {
+    const rankCounts = findDuplicates(cards);
+    
+    // Three of a kind will only have 1 rank in the duplicates as Full house contains a triple and pair
+    return Object.keys(rankCounts).length == 1 && rankCounts[Object.keys(rankCounts)[0]] == 3;
+}
+
+function checkTwoPair(cards) {
+    const rankCounts = findDuplicates(cards);
+
+    // Two pair will only have 2 ranks in the duplicates as Four of a Kind contains 2 pairs of the same rank
+    return Object.keys(rankCounts).length == 2 && rankCounts[Object.keys(rankCounts)[0]] == 2 &&
+        rankCounts[Object.keys(rankCounts)[1]] == 2;
+}
+
+function checkOnePair(cards) {
+    const rankCounts = findDuplicates(cards);
+
+    // One Pair will only have 1 rank in the duplicates as Two pair contains 2 pairs
+    return Object.keys(rankCounts).length == 1 && rankCounts[Object.keys(rankCounts)[0]] == 2;
+}
+
+/*
+// Test cases for checkStraight
+// Currently fails for Ace low
+// Expected  Order: true, true, true, true, true, false, false, false, false
+// Resulting Order: false, true, true, true, true, false, false, false, false
+const hands = [
+    // 5-high straight (Ace low)
+    ["A♠", "2♦", "3♣", "4♥", "5♠"],
+    
+    // 6-high straight
+    ["2♣", "3♠", "4♥", "5♦", "6♣"],
+    
+    // 9-high straight
+    ["5♠", "6♦", "7♣", "8♥", "9♦"],
+    
+    // Queen-high straight
+    ["8♣", "9♠", "10♦", "J♥", "Q♣"],
+    
+    // Ace-high straight (Broadway)
+    ["10♠", "J♦", "Q♥", "K♣", "A♣"],
+    
+    // Gap in sequence (missing 8)
+    ["5♣", "6♦", "7♠", "9♥", "10♣"],
+    
+    // Duplicate rank breaks sequence
+    ["6♣", "6♦", "7♠", "8♥", "9♣"],
+    
+    // Not consecutive (mixed gaps)
+    ["3♣", "5♦", "6♠", "9♥", "J♣"],
+    
+    // All face cards but missing 10 (no straight)
+    ["J♣", "Q♦", "K♠", "A♥", "A♣"]
+];
+
+for (hand of hands) {
+    console.log(checkStraight(hand));
+}
+*/
+
+function findDuplicates(cards) {
+    const sortedCards = sortCardsByRank(cards);
+
+    let rankCount = {};
+
+    for (let i = 0; i < sortedCards.length; i++) {
+        const rank = rankValue(sortedCards[i]);
+
+        if (rankCount[rank]) {
+            rankCount[rank]++;
+        } else {
+            rankCount[rank] = 1;
+        }
+    }
+
+    const duplicates = Object.fromEntries(
+        Object.entries(rankCount).filter(([rank, count]) => count > 1)
+    );
+
+    // console.log(duplicates);
+
+    return duplicates;
+}
+
+function findHand(cards) {
+    const allHands = getCombinations(cards);
+
+    for (const hand of allHands) {
+
+    }
 }
 
 function highCard(cards) {
