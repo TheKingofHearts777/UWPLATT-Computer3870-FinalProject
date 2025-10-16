@@ -174,20 +174,6 @@ function checkFlush(cards) {
     return true;
 }
 
-function checkAceLowStraight(cards) {
-    // Handle Ace-low straight (A-2-3-4-5)
-    const ranks = cards.map(c => rankValue(c));
-    const aceLowRanks = ranks.map(r => r === 14 ? 1 : r).sort((a, b) => a - b);
-    let isAceLowStraight = true;
-    for (let i = 1; i < aceLowRanks.length; i++) {
-        if (aceLowRanks[i] !== aceLowRanks[i - 1] + 1) {
-            isAceLowStraight = false;
-            break;
-        }
-    }
-    if (isAceLowStraight) return true;
-}
-
 function checkStraight(cards) {
     // Handle Ace-low straight (A-2-3-4-5)
     const ranks = cards.map(c => rankValue(c));
