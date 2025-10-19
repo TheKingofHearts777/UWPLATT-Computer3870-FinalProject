@@ -128,7 +128,12 @@ function rankValue(card) {
         "A":    14
     };
 
-    return valueMap[card.slice(0, -1)];
+    try {
+        return valueMap[card.slice(0, -1)];
+    } catch (e) {
+        console.error("exception: ", e);
+        console.log("card: ", card);
+    }
 }
 
 function getSuit(card) {
@@ -139,6 +144,42 @@ function sortCardsByRank(cards) {
     return cards.sort((a, b) => rankValue(a) - rankValue(b))
 }
 
+// Represents a 5-card hand
+class PokerHand {
+    constructor(cards) {
+        this.cards = cards;
+        this.duplicateRanks = findDuplicates(cards);
+
+        this.handRank = this.evaluate();
+    }
+
+    evaluate() {
+        if (checkRoyalFlush(this.cards)) {
+            this.handRank = HandRank.ROYAL_FLUSH;
+        } else if (checkStraightFlush(this.cards)) {
+            this.handRank = HandRank.STRAIGHT_FLUSH;
+        } else if (checkFourOfAKind(this.cards)) {
+            this.handRank = HandRank.FOUR_OF_A_KIND;
+        } else if (checkFullHouse(this.cards)) {
+            this.handRank = HandRank.FULL_HOUSE;
+        } else if (checkFlush(this.cards)) {
+            this.handRank = HandRank.FLUSH;
+        } else if (checkStraight(this.cards)) {
+            this.handRank = HandRank.STRAIGHT;
+        } else if (checkThreeOfAKind(this.cards)) {
+            this.handRank = HandRank.THREE_OF_A_KIND;
+        } else if (checkTwoPair(this.cards)) {
+            this.handRank = HandRank.TWO_PAIR;
+        } else if (checkOnePair(this.cards)) {
+            this.handRank = HandRank.ONE_PAIR;
+        } else {
+            this.handRank = HandRank.HIGH_CARD;
+        }
+
+        return this.handRank;
+    }
+};
+
 function getCombinations(cards) {
     const results = [];
 
@@ -146,7 +187,7 @@ function getCombinations(cards) {
     function helper(start, combo) {
         // Base case: if we’ve chosen 5 cards, store a copy
         if (combo.length === 5) {
-            results.push([...combo]);
+            results.push(new PokerHand([...combo]));
             return;
         }
 
@@ -298,6 +339,185 @@ for (hand of hands) {
 }
 */
 
+const HandRank = Object.freeze({
+    INVALID: -1,
+    HIGH_CARD: 1,
+    ONE_PAIR: 2,
+    TWO_PAIR: 3,
+    THREE_OF_A_KIND: 4,
+    STRAIGHT: 5,
+    FLUSH: 6,
+    FULL_HOUSE: 7,
+    FOUR_OF_A_KIND: 8,
+    STRAIGHT_FLUSH: 9,
+    ROYAL_FLUSH: 10,
+});
+
+// Functions to handle hand rank ties
+const HandTieFunctions = {
+    [HandRank.HIGH_CARD]: function(hand1, hand2) {
+        // Finished
+        
+        console.log("High Card:", hand1, hand2);
+
+        const hand1CardsSorted = sortCardsByRank(hand1.cards);
+        const hand2CardsSorted = sortCardsByRank(hand2.cards);
+
+        // Cards are sorted by ascending order so we have to start at the last card
+        for (let i = hand1CardsSorted.length - 1; i >= 0; i--) {
+            if (rankValue(hand1CardsSorted[i]) > rankValue(hand2CardsSorted[i])) {
+                return hand1;
+            } else if (rankValue(hand1CardsSorted[i]) < rankValue(hand2CardsSorted[i])) {
+                return hand2;
+            }
+        }
+
+        return null;
+    },
+
+    [HandRank.ONE_PAIR]: function(hand1, hand2) {
+        // Finished
+
+        console.log("One Pair:", hand1, hand2);
+
+        // Check rank of pair
+        const hand1_PairRank = Number(Object.keys(hand1.duplicateRanks)[0]);
+        const hand2_PairRank = Number(Object.keys(hand2.duplicateRanks)[0]);
+
+        if (hand1_PairRank > hand2_PairRank) {
+            return hand1;
+        } else if (hand1_PairRank < hand2_PairRank) {
+            return hand2;
+        }
+
+        // Need to generalize this?
+
+        // Filter hands to cards that are not paired
+        const hand1CardsWOPair = sortCardsByRank(hand1.cards.filter(
+            (card) => !Object.keys(hand1.duplicateRanks).includes(String(rankValue(card)))
+        ));
+
+        const hand2CardsWOPair = sortCardsByRank(hand2.cards.filter(
+            (card) => !Object.keys(hand2.duplicateRanks).includes(String(rankValue(card)))
+        ));
+
+        for (let i = 2; i >= 0; i--) {
+            if (rankValue(hand1CardsWOPair[i]) > rankValue(hand2CardsWOPair[i])) {
+                return hand1;
+            } else if (rankValue(hand1CardsWOPair[i]) < rankValue(hand2CardsWOPair[i])) {
+                return hand2;
+            }
+        }
+
+        return null;
+    },
+
+    [HandRank.TWO_PAIR]: function(hand1, hand2) {
+        // Finished
+
+        console.log("Two Pair:", hand1, hand2);
+
+        // Compare the rank of the 2 pairs in the hands
+        for (let i = Object.keys(hand1.duplicateRanks).length - 1; i >= 0; i--) {
+            const hand1PairRank = Number(Object.keys(hand1.duplicateRanks)[i]);
+            const hand2PairRank = Number(Object.keys(hand2.duplicateRanks)[i]);
+
+            if (hand1PairRank > hand2PairRank) {
+                return hand1;
+            } else if (hand1PairRank < hand2PairRank) {
+                return hand2;
+            }
+        }
+
+        // Filter hands to cards that are not paired
+        const hand1CardsWOPair = sortCardsByRank(hand1.cards.filter(
+            (card) => !Object.keys(hand1.duplicateRanks).includes(String(rankValue(card)))
+        ));
+
+        const hand2CardsWOPair = sortCardsByRank(hand2.cards.filter(
+            (card) => !Object.keys(hand2.duplicateRanks).includes(String(rankValue(card)))
+        ));
+
+        if (rankValue(hand1CardsWOPair[0]) > rankValue(hand2CardsWOPair[0])) {
+            return hand1;
+        } else if (rankValue(hand1CardsWOPair[0]) < rankValue(hand2CardsWOPair[0])) {
+            return hand2;
+        }
+
+        return null;
+    },
+
+    [HandRank.THREE_OF_A_KIND]: function(hand1, hand2) {
+        console.log("Three of a Kind:", hand1, hand2);
+
+        // Determined by rank of the triples, then ?
+    },
+
+    [HandRank.STRAIGHT]: function(hand1, hand2) {
+        console.log("Straight:", hand1, hand2);
+    },
+
+    [HandRank.FLUSH]: function(hand1, hand2) {
+        console.log("Flush:", hand1, hand2);
+
+        // Determined by highest card then second highest, ...
+    },
+
+    [HandRank.FULL_HOUSE]: function(hand1, hand2) {
+        console.log("Full House:", hand1, hand2);
+
+        // Determined by rank of triple then rank of pair
+    },
+
+    [HandRank.FOUR_OF_A_KIND]: function(hand1, hand2) {
+        // Finished
+
+        console.log("Four of a Kind:", hand1, hand2);
+
+        const hand1_4Rank = Number(Object.keys(hand1.duplicateRanks)[0]);
+        const hand2_4Rank = Number(Object.keys(hand2.duplicateRanks)[0]);
+
+        if (hand1_4Rank > hand2_4Rank) {
+            return hand1;
+        } else if (hand1_4Rank < hand2_4Rank) {
+            return hand2;
+        }
+
+        // Handle tie between 4 of a kind rank
+
+        // Filter hands to cards that are not paired
+        const hand1CardsWOPair = sortCardsByRank(hand1.cards.filter(
+            (card) => !Object.keys(hand1.duplicateRanks).includes(String(rankValue(card)))
+        ));
+
+        const hand2CardsWOPair = sortCardsByRank(hand2.cards.filter(
+            (card) => !Object.keys(hand2.duplicateRanks).includes(String(rankValue(card)))
+        ));
+
+        if (rankValue(hand1CardsWOPair[0]) > rankValue(hand2CardsWOPair[0])) {
+            return hand1;
+        } else if (rankValue(hand1CardsWOPair[0]) < rankValue(hand2CardsWOPair[0])) {
+            return hand2;
+        }
+
+        return null;
+    },
+
+    [HandRank.STRAIGHT_FLUSH]: function(hand1, hand2) {
+        console.log("Straight Flush:", hand1, hand2);
+
+        // Need to handle ace low straight
+    },
+
+    [HandRank.ROYAL_FLUSH]: function(hand1, hand2) {
+        // Finished
+
+        console.log("Royal Flush:", hand1, hand2);
+
+        return null;
+    },
+}
+
 function findDuplicates(cards) {
     const sortedCards = sortCardsByRank(cards);
 
@@ -317,16 +537,68 @@ function findDuplicates(cards) {
         Object.entries(rankCount).filter(([rank, count]) => count > 1)
     );
 
-    // console.log(duplicates);
-
     return duplicates;
 }
 
-function findHand(cards) {
-    const allHands = getCombinations(cards);
+function evaluateHand(hand) {
+    if (checkRoyalFlush(hand)) return HandRank.ROYAL_FLUSH;
+    if (checkStraightFlush(hand)) return HandRank.STRAIGHT_FLUSH;
+    if (checkFourOfAKind(hand)) return HandRank.FOUR_OF_A_KIND;
+    if (checkFullHouse(hand)) return HandRank.FULL_HOUSE;
+    if (checkFlush(hand)) return HandRank.FLUSH;
+    if (checkStraight(hand)) return HandRank.STRAIGHT;
+    if (checkThreeOfAKind(hand)) return HandRank.THREE_OF_A_KIND;
+    if (checkTwoPair(hand)) return HandRank.TWO_PAIR;
+    if (checkOnePair(hand)) return HandRank.ONE_PAIR;
+    return HandRank.HIGH_CARD;
+}
 
-    for (const hand of allHands) {
+function findBestHand(sevenCards) {
+    const hands = getCombinations(sevenCards, 5);
 
+    let bestHandRank = HandRank.INVALID;
+
+    // Used to store the best hands overall (all hands in this will be the same rank)
+    let bestHands = [];
+
+    // Find all hands of the best rank
+    for (let i = 0; i < hands.length; i++) {
+        const currentHand = hands[i];
+
+        const handRank = currentHand.handRank;
+        if (handRank == HandRank.ROYAL_FLUSH) {
+            bestHandRank = handRank;
+
+            return currentHand;
+        }
+
+        if (handRank > bestHandRank) {
+            bestHands = [currentHand];
+            bestHandRank = handRank;
+        } else if (handRank == bestHandRank) {
+            bestHands.push(currentHand);
+        }
+    }
+    
+    console.log(bestHands);
+
+    if (bestHands.length > 1) {
+        // find best hand of the rank
+        let bestHand = bestHands[0];
+
+        const handRank = bestHands[0].handRank;
+
+        for (let i = 1; i < bestHands.length; i++) {
+            const tieWinner = HandTieFunctions[handRank](bestHand, bestHands[i]);
+
+            if (tieWinner == bestHands[i]) {
+                bestHand = bestHands[i];
+            }
+        }
+
+        return bestHand;
+    } else {
+        return bestHands[0];
     }
 }
 
@@ -334,14 +606,50 @@ function highCard(cards) {
     return Math.max(...cards.map(c => rankValue(c)));
 }
 
+// const SUITS = ["♠", "♥", "♦", "♣"];
+
 function compareHands() {
+    // Test case for finding the best hand
+    // player best hand should be ["7♣", "7♥", "10♠", "A♥", "A♣"] ?
+    // computer best hand should be ["7♥", "10♦", "10♠", "A♥", "A♣"]
+    // board = ["7♥", "A♥", "A♣", "7♣", "10♠"];
+    // player = ["4♥", "8♣"];
+    // computer = ["2♥", "10♦"];
+
     const playerAll = [...player, ...board];
     const computerAll = [...computer, ...board];
-    const p = highCard(playerAll);
-    const c = highCard(computerAll);
-    if (p > c) return "You win!";
-    if (p < c) return "Computer wins!";
-    return "It's a tie!";
+
+    const playerBestHand    = findBestHand(playerAll);
+    const computerBestHand  = findBestHand(computerAll);
+
+    console.log("Player Best Hand:", playerBestHand);
+    console.log("Computer Best Hand:", computerBestHand);
+
+    let winningHand = null;
+
+    if (playerBestHand.handRank > computerBestHand.handRank) {
+        winningHand = playerBestHand;
+    } else if (playerBestHand.handRank < computerBestHand.handRank) {
+        winningHand = computerBestHand;
+    } else {
+        // Handle tie where hand ranks are equal
+        winningHand = HandTieFunctions[playerBestHand.handRank](playerBestHand, computerBestHand);
+    }
+
+
+    if (winningHand == playerBestHand) {
+        return "You win!";
+    } else if (winningHand == computerBestHand) {
+        return "Computer wins!";
+    } else {
+        return "It's a tie!";
+    }
+
+    // const p = highCard(playerAll);
+    // const c = highCard(computerAll);
+    // if (p > c) return "You win!";
+    // if (p < c) return "Computer wins!";
+    // return "It's a tie!";
 }
 
 deal();
