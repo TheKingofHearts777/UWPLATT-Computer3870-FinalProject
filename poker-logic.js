@@ -9,12 +9,15 @@ function pauseGame() {
     gameArea.style.filter = 'blur(5px)';
     pauseOverlay.style.display = 'flex';
 }
+
 function resumeGame() {
     gameArea.style.filter = 'none';
     pauseOverlay.style.display = 'none';
 }
+
 pauseBtn.addEventListener('click', pauseGame);
 resumeBtn.addEventListener('click', resumeGame);
+
 document.addEventListener('keydown', (e) => {
     if (e.key === "Escape") {
         (pauseOverlay.style.display === "flex") ? resumeGame() : pauseGame();
@@ -31,7 +34,11 @@ const gameStatus = document.getElementById('status');
 
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-let deck = [], player = [], computer = [], board = [], phase = 0;
+let deck = [];
+let player = [];
+let computer = [];
+let board = [];
+let phase = 0;
 
 function makeDeck() {
     // Create a new deck with all combinations of ranks and suits
@@ -49,20 +56,27 @@ function makeDeck() {
     }
 }
 
-function dealCard(to) { to.push(deck.pop()); }
-function burn() { deck.pop(); }
+function dealCard(to) {
+    to.push(deck.pop());
+}
+
+function burn() {
+    deck.pop();
+}
 
 function renderCards(elemId, cards, hidden = false) {
     nextPhaseBtn.textContent = "Next Phase";
+
     if (phase === 4) {
         nextPhaseBtn.textContent = "Deal Again";
         foldBtn.style.display = "none";
-    }
-    else {
+    } else {
         foldBtn.style.display = "inline-block";
     }
+
     const div = document.getElementById(elemId);
     div.innerHTML = "";
+    
     for (let c of cards) {
         const d = document.createElement("div");
         d.className = "card";
@@ -75,20 +89,35 @@ function renderCards(elemId, cards, hidden = false) {
             img.style.height = "100%";
             d.appendChild(img);
         } else {
-            if (c.endsWith("♥") || c.endsWith("♦")) d.style.color = "red";
+            if (c.endsWith("♥") || c.endsWith("♦")) {
+                d.style.color = "red";
+            }
+
             d.textContent = c;
         }
+
         div.appendChild(d);
     }
 }
 
 function deal() {
     makeDeck();
-    player = []; computer = []; board = []; phase = 0;
-    for (let i = 0; i < 2; i++) { dealCard(player); dealCard(computer); }
+
+    player = [];
+    computer = [];
+    board = [];
+    phase = 0;
+
+    for (let i = 0; i < 2; i++) {
+        dealCard(player);
+        dealCard(computer);
+    }
+    
     document.getElementById("status").textContent = "Pre-Flop";
+
     renderCards("playerHand", player);
     renderCards("computerHand", computer, true);
+
     gameBoard.innerHTML = "";
 }
 
@@ -100,14 +129,31 @@ function fold() {
 }
 
 function nextPhase() {
-    if (phase === 0) { burn(); dealCard(board); dealCard(board); dealCard(board); phase = 1; gameStatus.textContent = "Flop"; }
-    else if (phase === 1) { burn(); dealCard(board); phase = 2; gameStatus.textContent = "Turn"; }
-    else if (phase === 2) { burn(); dealCard(board); phase = 3; gameStatus.textContent = "River"; }
-    else if (phase === 3) {
+    if (phase === 0) {
+        burn();
+        dealCard(board);
+        dealCard(board);
+        dealCard(board);
+        phase = 1;
+        gameStatus.textContent = "Flop";
+    } else if (phase === 1) {
+        burn();
+        dealCard(board);
+        phase = 2;
+        gameStatus.textContent = "Turn";
+    } else if (phase === 2) {
+        burn();
+        dealCard(board);
+        phase = 3;
+        gameStatus.textContent = "River";
+    } else if (phase === 3) {
         renderCards("computerHand", computer, false);
         gameStatus.textContent = "Showdown: " + compareHands();
         phase = 4;
-    } else { deal(); }
+    } else {
+        deal();
+    }
+
     renderCards("board", board);
 }
 
