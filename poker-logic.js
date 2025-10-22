@@ -82,7 +82,7 @@ function renderCards(elemId, cards, hidden = false) {
         d.className = "card";
         if (hidden) {
             const img = document.createElement("img");
-            img.src = "assets/card-back.jpg";
+            img.src = "../assets/card-back.jpg";
             img.alt = "Card_back";
             img.style.fontSize = "10px";
             img.style.width = "100%";
@@ -122,7 +122,7 @@ function deal() {
 }
 
 function fold() {
-    gameStatus.textContent = "You folded. Computer wins!";
+    gameStatus.textContent = `You folded. ${localStorage.getItem('players') ? JSON.parse(localStorage.getItem('players'))[1].data.name : "Computer"} wins!`;
     phase = 4;
     renderCards("computerHand", computer, false);
     nextPhaseBtn.textContent = "Deal Again";
@@ -747,9 +747,9 @@ function compareHands() {
 
 
     if (winningHand == playerBestHand) {
-        return "You win!";
+        return `${localStorage.getItem('players') ? JSON.parse(localStorage.getItem('players'))[0].data.name : "Player"} wins!`;
     } else if (winningHand == computerBestHand) {
-        return "Computer wins!";
+        return `${localStorage.getItem('players') ? JSON.parse(localStorage.getItem('players'))[1].data.name : "Computer"} wins!`;
     } else {
         return "It's a tie!";
     }

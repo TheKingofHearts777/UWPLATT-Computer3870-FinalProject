@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Game</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="../css/styles.css">
 </head>
 
 <body>
@@ -14,10 +14,10 @@
             style="position:absolute; top:20px; left:20px; z-index:1000;">Pause</button>
 
         <div id="table-area">
-            <h2 style="text-shadow: 2px 2px #000;">You vs Computer</h2>
+            <h2 id="title" style="text-shadow: 2px 2px #000;"></h2>
             <div id="board"></div>
 
-            <h3>Your Hand</h3>
+            <h3>Hand</h3>
             <div id="playerHand"></div>
 
             <h3>Computer</h3>
@@ -36,12 +36,13 @@
         <div class="menu-container">
             <h2>Game Paused</h2>
             <button class="menu-btn" id="resume-btn">Resume Game</button>
-            <button class="menu-btn" onclick="location.href='settings.html'">Settings</button>
-            <button class="menu-btn" onclick="location.href='index.html'">Return to Main Menu</button>
+            <button class="menu-btn" id="settings-btn" onclick="location.href='../settings.html'">Settings</button>
+            <button class="menu-btn" id="main-menu-btn" onclick="location.href='../index.html'">Return to Main Menu</button>
         </div>
     </div>
 
-    <script src="./poker-logic.js"> </script>
+    <script src="./start-game.js" type="module"></script>
+    <script src="../poker-logic.js"></script>
 </body>
 
 </html>
