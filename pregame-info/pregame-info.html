@@ -8,19 +8,48 @@
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
+<style>
+.menu-container input[type="text"],
+.menu-container input[type="number"] {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    text-align: center;
+    outline: none;
+}
+
+.menu-container input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+    cursor: text;
+}
+
+.menu-container input[type=number]::-webkit-inner-spin-button,
+.menu-container input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+</style>
+
 <body>
     <div class="menu-container">
         <h1>Enter Game Information:</h1>
-        <div>
-            <input type="text" id="player-name-input" placeholder="Your Name">
-        </div>
-        <div>
-            <input type="text" id="starting-money-input" placeholder="Starting Money (e.g., 1000)">
-        </div>
-        <div>
-            <input type="text" id="number-of-players-input" placeholder="Number of Players (e.g., 2; max of 4)">
-        </div>
-        <button class="menu-btn" id="start-game-btn">Start Game</button>
+        <form id="start-game-form">
+            <div>
+                <input type="text" id="player-name-input" placeholder="Your Name">
+            </div>
+            <div>
+                <input type="number" id="starting-money-input" min="1" placeholder="Starting Money (e.g., 1000)">
+            </div>
+            <div>
+                <input type="number" id="number-of-players-input" min="2" max="4" placeholder="Number of Players (e.g., 2; max of 4)">
+            </div>
+            <button class="menu-btn" id="start-game-btn">Start Game</button>
+        </form>
     </div>
 
 
