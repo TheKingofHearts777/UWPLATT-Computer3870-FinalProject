@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 
 import { nextPhase, fold } from "./logic/engine.js";
@@ -33,7 +33,7 @@ function CardComponent({ cardText, hidden = false }) {
 function PlayerHand({ player, name, id }) {
     return (
         <>
-            <h3>{name}</h3>
+            <h3>{name} {player.isDealer && "(Dealer)"} {player.folded && "(Folded)"}</h3>
             <div id={id}>
                 {player.hand.map((card) => <CardComponent key={card} cardText={card} hidden={player.hideHand} />)}
             </div>
@@ -49,12 +49,44 @@ function BoardCards({ boardCards }) {
 
 function TableArea({ game, setGame }) {
 
+    const humanPlayer = game.players.filter((player) => player.isHuman)[0];
+
+    const timerRef = useRef(null);
+
+    function advancePhase() {
+        setGame(prev => {
+            const updated = nextPhase(prev);
+
+            if (updated.phase === 4) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+
+            return updated;
+        });
+    }
+
+    // Autoplay system when the human player folds with more than 1 other player still active
+    useEffect(() => {
+        if (humanPlayer.folded && game.areMultiplePlayersActive() && !timerRef.current) {
+            timerRef.current = setInterval(advancePhase, 1500); // 1.5 seconds for each phase
+        }
+
+        // Cleanup when component unmounts or dependencies change
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+        };
+    }, [humanPlayer.folded])
+
     function NextPhaseButton() {
         return (
             <Button
                 className="menu-btn"
                 id="nextBtn"
-                onClick={() => setGame(prev => nextPhase(prev))}
+                onClick={advancePhase}
             >
                 {game.phase !== 4 ? "Next Phase" : "Deal Again"}
             </Button>
@@ -66,7 +98,7 @@ function TableArea({ game, setGame }) {
             <Button
                 className="menu-btn"
                 id="foldBtn"
-                style={{ display: (game.phase !== 4 ? "inline-block" : "none") }}
+                style={{ display: (game.phase !== 4 && !humanPlayer.folded ? "inline-block" : "none") }}
                 onClick={() => setGame(prev => fold(prev))}
             >
                 Fold
@@ -74,13 +106,18 @@ function TableArea({ game, setGame }) {
         );
     }
 
+    const playerHands = game.players.map((player) => {
+        return (
+            <PlayerHand key={player.id} player={player} name={player.name} id={player.id} />
+        )
+    });
+
     return (
         <div id="table-area">
             <h2 id="title">Player vs Computer</h2>
             <BoardCards boardCards={game.boardCards} />
 
-            <PlayerHand player={game.players[0]} name="Hand" id="playerHand" />
-            <PlayerHand player={game.players[1]} name="Computer" id="computerHand" />
+            {playerHands}
 
             <div id="controls">
                 <NextPhaseButton />

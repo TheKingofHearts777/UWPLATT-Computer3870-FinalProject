@@ -100,13 +100,13 @@ class PokerHand {
     }
 };
 
-function getCombinations(cards) {
+function getCombinations(cards, count) {
     const results = [];
 
     // Helper recursive function
     function helper(start, combo) {
-        // Base case: if we’ve chosen 5 cards, store a copy
-        if (combo.length === 5) {
+        // Base case: if we’ve chosen count cards, store a copy
+        if (combo.length === count) {
             results.push(new PokerHand([...combo]));
             return;
         }
@@ -587,20 +587,19 @@ function findBestHand(sevenCards) {
     }
 }
 
-function renderCards(state, id, hidden = false) {
-    const playerToRender = state.players.filter((entry) => entry.id == id)[0];
-    playerToRender.hideHand = hidden;
-}
-
 function deal(state) {
     makeDeck(state);
 
     for (let player of state.players) {
         player.resetHand();
     }
+    
     state.boardCards = [];
     state.phase = 0;
 
+    state.advanceDealer();
+
+    // Deal 2 cards to all players
     for (let i = 0; i < 2; i++) {
         for (let j = 0; j < state.players.length; j++) {
             dealCard(state, state.players[j].hand);
@@ -610,20 +609,42 @@ function deal(state) {
     state.message = "Pre-Flop";
 
     // only show hand of human player
-    renderCards(state, "playerHand");
-    renderCards(state, "computerHand", true);
+    for (let i = 0; i < state.players.length; i++) {
+        if (state.players[i].isHuman) {
+            state.players[i].hideHand = false;
+        } else {
+            state.players[i].hideHand = true;
+        }
+    }
 }
 
 export function fold(origState) {
     let state = { ...origState };
 
-    state.message = `You folded. Computer wins!`;
-    state.phase = 4;
+    state.players[0].fold();
+
+    if (!state.areMultiplePlayersActive()) {
+        let otherPlayers = state.players.filter((player) => !player.isHuman);
+
+        state.message = `You folded. ${compareHands(state.boardCards, otherPlayers)}`;
+        state.phase = 4;
+
+        // show hands of all players
+        for (let player of otherPlayers) {
+            player.hideHand = false;
+        }
+    }
+
+    // all players excluding human who folded (generalize this to any player folding)
+    // let otherPlayers = state.players.filter((player) => !player.isHuman);
+
+    // state.message = `You folded. ${compareHands(state.boardCards, otherPlayers)}`;
+    // state.phase = 4;
 
     // show hands of all players
-    for (let player of state.players) {
-        player.hideHand = false;
-    }
+    // for (let player of otherPlayers) {
+    //     player.hideHand = false;
+    // }
 
     return state;
 }
@@ -662,8 +683,8 @@ export function nextPhase(origState) {
 
         // gameStatus.textContent = "Showdown: " + compareHands();
         state.phase = 4;
-        state.message = "Showdown: " + compareHands(state);
-    } else {
+        state.message = "Showdown: " + compareHands(state.boardCards, state.players);
+    } else if (state.phase === 4 && (!state.areMultiplePlayersActive())) {
         deal(state);
     }
 
@@ -692,18 +713,21 @@ function getWinningPlayer(players) {
     return players.filter((player) => player.bestHand == winningHand)[0];
 }
 
-function compareHands(state) {
+function compareHands(boardCards, players) {
 
-    // find best hands of all players
-    for (let player of state.players) {
-        player.bestHand = findBestHand([...player.hand, ...state.boardCards]);
+    // ignore all players who folded
+    let activePlayers = players.filter((player) => !player.folded);
+
+    // find best hands of all active players
+    for (let player of activePlayers) {
+        player.bestHand = findBestHand([...player.hand, ...boardCards]);
     }
 
-    for (let player of state.players) {
+    for (let player of activePlayers) {
         console.log(`${player.name} Best Hand: `, player.bestHand);
     }
 
-    let winningPlayer = getWinningPlayer(state.players);
+    let winningPlayer = getWinningPlayer(activePlayers);
 
     // if (playerBestHand.handRank > computerBestHand.handRank) {
     //     winningHand = playerBestHand;
@@ -723,6 +747,11 @@ function compareHands(state) {
     //     return "It's a tie!";
     // }
 
+    // players are no longer active as the hand has ended
+    for (let player of activePlayers) {
+        player.isActive = false;
+    }
+
     if (winningPlayer === null) {
         return "It's a tie!";
     }
@@ -730,17 +759,73 @@ function compareHands(state) {
     return winningPlayer.name + " wins!";
 }
 
-export function createInitialGame() {
+export function createInitialGame(settings) {
+    let players = [new Player("Player", "playerHand", "human", true)];
+
+    for (let i = 0; i < settings.cpu_count; i++) {
+        players.push(new Player("Computer" + i, "computerHand" + i, "cpu", false, true))
+    }
+
+    let dealer = players[Math.floor(Math.random() * players.length)];
+    dealer.setDealer(true);
+
     let state = {
-        players: [
-            new Player("Player", "playerHand", "human"),
-            new Player("Computer", "computerHand", "cpu", true)
-        ],
+        players: players,
         deck: [],
         pot: 0,
+        previousBet: 0,
+        dealer: dealer,
         boardCards: [],
         phase: 0,
         message: "Pre-Flop",
+
+        areMultiplePlayersActive: function() {
+            let activeCount = 0;
+            for (let i = 0; i < this.players.length; i++) {
+                if (this.players[i].isActive) {
+                    activeCount++; 
+                }
+            }
+
+            return activeCount > 1;
+        },
+
+        raiseBet: function(player, bet) {
+            
+        },
+
+        getSmallBlindPlayer: function() {
+            let dealerIndex = this.players.indexOf(this.dealer);
+            if (dealerIndex == -1) {
+                console.error("No dealer set in getSmallBlindPlayer!");
+
+                return null;
+            }
+
+            return (dealerIndex == 0) ? this.players[this.players.length - 1] : this.players[dealerIndex - 1];
+        },
+
+        getLargeBlindPlayer: function() {
+            let dealerIndex = this.players.indexOf(this.dealer);
+            if (dealerIndex == -1) {
+                console.error("No dealer set in getLargeBlindPlayer!");
+
+                return null;
+            }
+
+            return (dealerIndex < 2) ? this.players[this.players.length - dealerIndex - 1] : this.players[dealerIndex - 2];
+        },
+
+        advanceDealer: function() {
+            // get next player to the left of the current dealer
+            let newDealer = this.getSmallBlindPlayer();
+
+            let previousDealer = this.dealer;
+            previousDealer.setDealer(false);
+
+            this.dealer = newDealer;
+            newDealer.setDealer(true);
+        }
     };
 
     deal(state);

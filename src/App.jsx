@@ -17,15 +17,20 @@ function App() {
     }
 
     const [settings, setSettings] = useState(getDefaultSettings());
+    const [game, setGame] = useState(null);
 
-    const [game, setGame] = useState(createInitialGame());
+    function startGame() {
+        const newGame = createInitialGame(settings);
+        setGame(newGame);
+        setCurrentView("game");
+    }
 
     return (
         <>
-            {currentView === "home"     && <HomeView setCurrentView={setCurrentView} />}
+            {currentView === "home"     && <HomeView setCurrentView={setCurrentView} startNewGame={startGame} />}
             {currentView === "game"     && <GameView setViewToHome={setViewToHome} game={game} setGame={setGame} />}
             {currentView === "rules"    && <RulesView setViewToHome={setViewToHome} />}
-            {currentView === "settings" && <SettingsView setViewToHome={setViewToHome} />}
+            {currentView === "settings" && <SettingsView setViewToHome={setViewToHome} settings={settings} setSettings={setSettings} />}
             {currentView === "about"    && <AboutView setViewToHome={setViewToHome} />}
         </>
     )
