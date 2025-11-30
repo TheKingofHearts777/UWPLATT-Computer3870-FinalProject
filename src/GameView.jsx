@@ -17,44 +17,65 @@ function PauseMenu({ resumeGame, setViewToHome }) {
 }
 
 function CardComponent({ cardText, hidden = false }) {
-    const styleObject = !hidden ? ((cardText.endsWith("♥") || cardText.endsWith("♦")) ? { color: "red" } : {}) : {};
+    const styleObject =
+        !hidden && (cardText.endsWith("♥") || cardText.endsWith("♦"))
+            ? { color: "red" }
+            : {};
 
     return (
         <div className="card" style={styleObject}>
-            {hidden && (<img
-                src="../assets/card-back.jpg"
-                alt="Card_back"
-                style={{ fontSize: "10px", width: "100%", height: "100%" }}></img>)}
+            {hidden && (
+                <img
+                    src="../assets/card-back.jpg"
+                    alt="Card_back"
+                    style={{ fontSize: "10px", width: "100%", height: "100%" }}
+                />
+            )}
             {!hidden && cardText}
-        </div >
-    )
+        </div>
+    );
 }
 
-function PlayerHand({ player, name, id }) {
+// UPDATED: added "position" and seat wrapper
+function PlayerHand({ player, name, id, position }) {
+    const seatClass = `player-seat pos-${position || "center"}`;
+
     return (
-        <>
-            <h3>{name} {player.isDealer && "(Dealer)"} {player.folded && "(Folded)"}</h3>
-            <div id={id}>
-                {player.hand.map((card) => <CardComponent key={card} cardText={card} hidden={player.hideHand} />)}
+        <div className={seatClass} data-player-id={id}>
+            <h3>
+                {name} {player.isDealer && "(Dealer)"}{" "}
+                {player.folded && "(Folded)"}
+            </h3>
+            <div className="player-hand">
+                {player.hand.map((card) => (
+                    <CardComponent
+                        key={card}
+                        cardText={card}
+                        hidden={player.hideHand}
+                    />
+                ))}
             </div>
-        </>
+        </div>
     );
 }
 
 function BoardCards({ boardCards }) {
     return (
-        <div id="board">{boardCards.map((card) => <CardComponent key={card} cardText={card} />)}</div>
+        <div id="board">
+            {boardCards.map((card) => (
+                <CardComponent key={card} cardText={card} />
+            ))}
+        </div>
     );
 }
 
 function TableArea({ game, setGame }) {
-
     const humanPlayer = game.players.filter((player) => player.isHuman)[0];
 
     const timerRef = useRef(null);
 
     function advancePhase() {
-        setGame(prev => {
+        setGame((prev) => {
             const updated = nextPhase(prev);
 
             if (updated.phase === 4) {
@@ -68,7 +89,11 @@ function TableArea({ game, setGame }) {
 
     // Autoplay system when the human player folds with more than 1 other player still active
     useEffect(() => {
-        if (humanPlayer.folded && game.areMultiplePlayersActive() && !timerRef.current) {
+        if (
+            humanPlayer.folded &&
+            game.areMultiplePlayersActive() &&
+            !timerRef.current
+        ) {
             timerRef.current = setInterval(advancePhase, 1500); // 1.5 seconds for each phase
         }
 
@@ -79,15 +104,11 @@ function TableArea({ game, setGame }) {
                 timerRef.current = null;
             }
         };
-    }, [humanPlayer.folded])
+    }, [humanPlayer.folded]);
 
     function NextPhaseButton() {
         return (
-            <Button
-                className="menu-btn"
-                id="nextBtn"
-                onClick={advancePhase}
-            >
+            <Button className="menu-btn" id="nextBtn" onClick={advancePhase}>
                 {game.phase !== 4 ? "Next Phase" : "Deal Again"}
             </Button>
         );
@@ -98,26 +119,62 @@ function TableArea({ game, setGame }) {
             <Button
                 className="menu-btn"
                 id="foldBtn"
-                style={{ display: (game.phase !== 4 && !humanPlayer.folded ? "inline-block" : "none") }}
-                onClick={() => setGame(prev => fold(prev))}
+                style={{
+                    display:
+                        game.phase !== 4 && !humanPlayer.folded
+                            ? "inline-block"
+                            : "none",
+                }}
+                onClick={() => setGame((prev) => fold(prev))}
             >
                 Fold
             </Button>
         );
     }
 
-    const playerHands = game.players.map((player) => {
+    // NEW: layout map based on player count
+    const playerCount = game.players.length;
+
+    const seatLayouts = {
+        2: ["top-center", "bottom-center"],
+        3: ["top-center", "middle-left", "middle-right"],
+        4: ["top-center", "middle-left", "bottom-center", "middle-right"],
+    };
+
+    const activeLayout =
+        seatLayouts[playerCount] || seatLayouts[Math.min(playerCount, 4)];
+
+    const playerHands = game.players.map((player, index) => {
+        const position = activeLayout[index] || "center";
         return (
-            <PlayerHand key={player.id} player={player} name={player.name} id={player.id} />
-        )
+            <PlayerHand
+                key={player.id}
+                player={player}
+                name={player.name}
+                id={player.id}
+                position={position}
+            />
+        );
     });
 
     return (
         <div id="table-area">
             <h2 id="title">Player vs Computer</h2>
-            <BoardCards boardCards={game.boardCards} />
 
-            {playerHands}
+            <div className="grid-players">
+                {/* Center cell: River cards */}
+                <div
+                    className="board-center"
+                    style={{
+                        width: `${game.boardCards.length * 80}px`,
+                        minWidth: "120px",
+                    }}
+                >
+                    <BoardCards boardCards={game.boardCards} />
+                </div>
+
+                {playerHands}
+            </div>
 
             <div id="controls">
                 <NextPhaseButton />
@@ -127,10 +184,10 @@ function TableArea({ game, setGame }) {
             <p id="status">{game.message}</p>
         </div>
     );
+
 }
 
 function GameView({ setViewToHome, game, setGame }) {
-
     const [paused, setPaused] = useState(false);
 
     function pauseGame() {
@@ -143,24 +200,37 @@ function GameView({ setViewToHome, game, setGame }) {
 
     function handleKeyDown(event) {
         if (event.key === "Escape") {
-            setPaused(isPaused => !isPaused);
+            setPaused((isPaused) => !isPaused);
         }
     }
 
     return (
-        <div id="game-area" className="start-game-body" tabIndex={0} onKeyDown={handleKeyDown}>
+        <div
+            id="game-area"
+            className="start-game-body"
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+        >
             {!paused && (
                 <Button
                     className="menu-btn"
                     onClick={pauseGame}
                     style={{
-                        position: "absolute", top: "20px", left: "20px", zIndex: 1000
+                        position: "absolute",
+                        top: "20px",
+                        left: "20px",
+                        zIndex: 1000,
                     }}
                 >
                     Pause
                 </Button>
             )}
-            {paused && <PauseMenu resumeGame={resumeGame} setViewToHome={setViewToHome} />}
+            {paused && (
+                <PauseMenu
+                    resumeGame={resumeGame}
+                    setViewToHome={setViewToHome}
+                />
+            )}
 
             <TableArea game={game} setGame={setGame} />
         </div>
