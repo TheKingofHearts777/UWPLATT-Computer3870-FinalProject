@@ -159,7 +159,7 @@ function TableArea({ game, setGame }) {
 
     return (
         <div id="table-area">
-            <h2 id="title">Player vs Computer</h2>
+            <h2 id="title">Player vs Computer(s)</h2>
 
             <div className="grid-players">
                 {/* Center cell: River cards */}
