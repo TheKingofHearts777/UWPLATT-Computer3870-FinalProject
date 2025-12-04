@@ -1,0 +1,26 @@
+import { Button } from "react-bootstrap";
+
+function RulesView({ setViewToHome }) {
+    return (
+        <div className="menu-container">
+            <h1>Rules</h1>
+            <h2>Here are the rules of Texas Hold 'Em Poker:</h2>
+
+            <ol>
+                <li className="rules-item">Each player receives two private cards ("hole cards").</li>
+                <li className="rules-item">Five community cards are dealt face-up in stages: three for the Flop, one for the Turn, and one for the River.</li>
+                <li className="rules-item">Players use any combination of their hole cards and the community cards to make the best five-card hand.</li>
+                <li className="rules-item">There are four betting rounds: Pre-Flop (after hole cards), Flop, Turn, and River.</li>
+                <li className="rules-item">On each turn, players can Fold (quit), Call (match the bet), or Raise (increase the bet).</li>
+                <li className="rules-item">Before cards are dealt, the two players (if there are more than three) left of the dealer post mandatory bets: the small blind and big blind.</li>
+                <li className="rules-item">After each round, the small and big blinds rotate amongst the players clock-wise.</li>
+                <li className="rules-item">After the final betting round, if more than one player remains, a showdown occurs and the best hand wins the pot.</li>
+                <li className="rules-item">The computer acts as the dealer, handling cards and bets.</li>
+            </ol>
+
+            <Button className="menu-btn" onClick={setViewToHome}>Back to Main Menu</Button>
+        </div>
+    )
+}
+
+export default RulesView;

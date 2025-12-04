@@ -1,0 +1,6 @@
+MONGO_URI = mongodb+srv://<username>:<password>@cluster0.5guawtk.mongodb.net/
+DBNAME = CS3870-Final Project
+SECRET_KEY = <secret_key>
+COLLECTION = users
+HOST = 127.0.0.1
+PORT = 8081
