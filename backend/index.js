@@ -17,6 +17,12 @@ const DBNAME = process.env.DBNAME;
 const SECRET_KEY = process.env.SECRET_KEY;
 const COLLECTION = process.env.COLLECTION;
 
+if (!HOST) {
+    console.log("HOST not defined in .env, defaulting to localhost");
+}
+if (!PORT) {
+    console.log("PORT not defined in .env, defaulting to 8081");
+}
 if (!MONGO_URI) {
     throw new Error("MONGO_URI is not defined in .env");
 }
@@ -25,6 +31,9 @@ if (!DBNAME) {
 }
 if (!SECRET_KEY) {
     throw new Error("SECRET_KEY is not defined in .env");
+}
+if (!COLLECTION) {
+    throw new Error("COLLECTION is not defined in .env");
 }
 
 // Mongo client and collection references
@@ -114,6 +123,7 @@ app.post("/signup", async (req, res) => {
                 username: user.username,
             },
         });
+        console.log("New user signed up: ", { user });
     } catch (err) {
         console.error("Signup error:", err);
         res.status(500).json({ error: "Internal server error" });
@@ -121,7 +131,7 @@ app.post("/signup", async (req, res) => {
 });
 
 // Login route
-app.post("/login", authenticateToken, async (req, res) => {
+app.post("/login", async (req, res) => {
     try {
         const { username, password } = req.body;
 
@@ -143,7 +153,7 @@ app.post("/login", authenticateToken, async (req, res) => {
 
         const token = generateAccessToken(user);
 
-        res.json({
+        res.status(200).json({
             token,
             user: {
                 id: user._id,

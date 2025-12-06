@@ -6,10 +6,12 @@ export default function LoginView({ setCurrentView }) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
 
-    async function handleLogin(event) {
+    const handleSignup = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch("http://localhost:8081/login", {
+            const backendUrl = `http://localhost:8081/signup`;
+
+            const response = await fetch(backendUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -20,33 +22,22 @@ export default function LoginView({ setCurrentView }) {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || "Login failed");
+                setError(data.error);
                 return;
             }
 
-            // Store token and navigate to home
             localStorage.setItem("token", data.token);
-            setCurrentView("home");
+            setCurrentView("login");
         } catch (err) {
-            setError("An error occurred during login");
-            console.error("Login error:", err);
+            setError("An error occurred. Please try again.");
+            console.error("Signup error:", err);
         }
-    }
-
-    function handleSignup(event) {
-        event.preventDefault();
-        setCurrentView("signup");
-    }
-
-    function handleGuestPlay(event) {
-        event.preventDefault();
-        setCurrentView("home");
     }
 
     return (
         <div className="login-container" style={{justifyItems: "center"}}>
-            <Form onSubmit={handleLogin} className="menu-container">
-                <h1>Login</h1>
+            <Form onSubmit={handleSignup} className="menu-container">
+                <h1>Signup</h1>
                 <Form.Group controlId="formUsername">
                     <Form.Label>Username</Form.Label>
                     <Form.Control
@@ -82,14 +73,8 @@ export default function LoginView({ setCurrentView }) {
                     />
                 </Form.Group>
                 {error && <p className="error-text">{error}</p>}
-                <Button style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleLogin}>
-                    Login
-                </Button>
                 <Button style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
                     Signup
-                </Button>
-                <Button style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleGuestPlay}>
-                    Play as Guest
                 </Button>
             </Form>
         </div>

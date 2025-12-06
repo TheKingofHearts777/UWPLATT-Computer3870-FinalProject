@@ -8,6 +8,7 @@ import { getDefaultSettings, SettingsView } from "./SettingsView";
 import AboutView from "./AboutView";
 import RulesView from "./RulesView";
 import LoginView from "./LoginView";
+import SignupView from "./SignupView";
 import createInitialGame from "./logic/engine";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
     return (
         <>
             {currentView === "login"    && <LoginView setCurrentView={setCurrentView} setUsername={username} setPassword={password}/>}
+            {currentView === "signup"   && <SignupView setCurrentView={setCurrentView} setUsername={username} setPassword={password}/>}
             {currentView === "home"     && <HomeView setCurrentView={setCurrentView} startNewGame={startGame} />}
             {currentView === "game"     && <GameView setViewToHome={setViewToHome} game={game} setGame={setGame} />}
             {currentView === "rules"    && <RulesView setViewToHome={setViewToHome} />}
