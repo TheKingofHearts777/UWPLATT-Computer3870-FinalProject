@@ -12,7 +12,7 @@ import SignupView from "./SignupView";
 import createInitialGame from "./logic/engine";
 
 function App() {
-    const [currentView, setCurrentView] = useState("home");
+    const [currentView, setCurrentView] = useState("login");
 
     function setViewToHome() {
         setCurrentView("home");

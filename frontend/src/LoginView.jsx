@@ -9,7 +9,7 @@ export default function LoginView({ setCurrentView }) {
     async function handleLogin(event) {
         event.preventDefault();
         try {
-            const response = await fetch("http://localhost:8081/login", {
+            const response = await fetch("https://uwplatt-computer3870-finalproject-backend.onrender.com/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

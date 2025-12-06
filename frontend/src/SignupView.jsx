@@ -9,7 +9,7 @@ export default function LoginView({ setCurrentView }) {
     const handleSignup = async (event) => {
         event.preventDefault();
         try {
-            const backendUrl = `http://localhost:8081/signup`;
+            const backendUrl = `https://uwplatt-computer3870-finalproject-backend.onrender.com/signup`;
 
             const response = await fetch(backendUrl, {
                 method: "POST",
