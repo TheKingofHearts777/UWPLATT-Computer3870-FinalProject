@@ -7,10 +7,12 @@ import GameView from "./GameView";
 import { getDefaultSettings, SettingsView } from "./SettingsView";
 import AboutView from "./AboutView";
 import RulesView from "./RulesView";
-import { createInitialGame } from "./logic/engine";
+import LoginView from "./LoginView";
+import SignupView from "./SignupView";
+import createInitialGame from "./logic/engine";
 
 function App() {
-    const [currentView, setCurrentView] = useState("home");
+    const [currentView, setCurrentView] = useState("login");
 
     function setViewToHome() {
         setCurrentView("home");
@@ -18,6 +20,8 @@ function App() {
 
     const [settings, setSettings] = useState(getDefaultSettings());
     const [game, setGame] = useState(null);
+    const [username, setUsername] = useState(null);
+    const [password, setPassword] = useState(null);
 
     function startGame() {
         const newGame = createInitialGame(settings);
@@ -27,6 +31,8 @@ function App() {
 
     return (
         <>
+            {currentView === "login"    && <LoginView setCurrentView={setCurrentView} setUsername={username} setPassword={password}/>}
+            {currentView === "signup"   && <SignupView setCurrentView={setCurrentView} setUsername={username} setPassword={password}/>}
             {currentView === "home"     && <HomeView setCurrentView={setCurrentView} startNewGame={startGame} />}
             {currentView === "game"     && <GameView setViewToHome={setViewToHome} game={game} setGame={setGame} />}
             {currentView === "rules"    && <RulesView setViewToHome={setViewToHome} />}
