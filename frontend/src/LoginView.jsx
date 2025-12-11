@@ -10,6 +10,9 @@ export default function LoginView({ setCurrentView }) {
         event.preventDefault();
         const loginButton = document.getElementById("login");
         loginButton.disabled = true;
+
+        const inputs = document.querySelectorAll("input");
+        inputs.forEach(input => input.disabled = true);
         
         try {
             const response = await fetch("https://uwplatt-computer3870-finalproject-backend.onrender.com/login", {

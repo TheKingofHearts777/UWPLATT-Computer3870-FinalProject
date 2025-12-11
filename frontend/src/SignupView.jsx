@@ -10,6 +10,9 @@ export default function LoginView({ setCurrentView }) {
         event.preventDefault();
         const signupButton = document.getElementById("signup");
         signupButton.disabled = true;
+
+        const inputs = document.querySelectorAll("input");
+        inputs.forEach(input => input.disabled = true);
         
         try {
             const backendUrl = `https://uwplatt-computer3870-finalproject-backend.onrender.com/signup`;
