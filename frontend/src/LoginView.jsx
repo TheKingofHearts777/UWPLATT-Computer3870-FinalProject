@@ -8,6 +8,9 @@ export default function LoginView({ setCurrentView }) {
 
     async function handleLogin(event) {
         event.preventDefault();
+        const loginButton = document.getElementById("login");
+        loginButton.disabled = true;
+        
         try {
             const response = await fetch("https://uwplatt-computer3870-finalproject-backend.onrender.com/login", {
                 method: "POST",
@@ -82,13 +85,13 @@ export default function LoginView({ setCurrentView }) {
                     />
                 </Form.Group>
                 {error && <p className="error-text">{error}</p>}
-                <Button style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleLogin}>
+                <Button id="login" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleLogin}>
                     Login
                 </Button>
-                <Button style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
+                <Button id="signup"style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
                     Signup
                 </Button>
-                <Button style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleGuestPlay}>
+                <Button id="guest" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleGuestPlay}>
                     Play as Guest
                 </Button>
             </Form>
