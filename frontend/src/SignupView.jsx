@@ -8,6 +8,9 @@ export default function LoginView({ setCurrentView }) {
 
     const handleSignup = async (event) => {
         event.preventDefault();
+        const signupButton = document.getElementById("signup");
+        signupButton.disabled = true;
+        
         try {
             const backendUrl = `https://uwplatt-computer3870-finalproject-backend.onrender.com/signup`;
 
@@ -73,7 +76,7 @@ export default function LoginView({ setCurrentView }) {
                     />
                 </Form.Group>
                 {error && <p className="error-text">{error}</p>}
-                <Button style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
+                <Button id="signup" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
                     Signup
                 </Button>
             </Form>
