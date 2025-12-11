@@ -29,7 +29,10 @@ export default function LoginView({ setCurrentView }) {
                 setError(data.error || "Login failed");
                 return;
             }
-
+            
+            loginButton.disabled = false;
+            inputs.forEach(input => input.disabled = false);
+            
             // Store token and navigate to home
             localStorage.setItem("token", data.token);
             setCurrentView("home");
@@ -56,7 +59,7 @@ export default function LoginView({ setCurrentView }) {
                 <Form.Group controlId="formUsername">
                     <Form.Label>Username</Form.Label>
                     <Form.Control
-                        type="text"
+                        type="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         onFocus={(e) => {

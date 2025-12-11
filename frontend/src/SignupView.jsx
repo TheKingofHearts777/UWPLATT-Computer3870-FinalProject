@@ -32,6 +32,9 @@ export default function LoginView({ setCurrentView }) {
                 return;
             }
 
+            signupButton.disabled = false;
+            inputs.forEach(input => input.disabled = false);
+
             localStorage.setItem("token", data.token);
             setCurrentView("login");
         } catch (err) {
@@ -40,14 +43,19 @@ export default function LoginView({ setCurrentView }) {
         }
     }
 
+    const handleBack = (event) => {
+        event.preventDefault();
+        setCurrentView("login");
+    }
+
     return (
-        <div className="login-container" style={{justifyItems: "center"}}>
+        <div className="signup-container" style={{justifyItems: "center"}}>
             <Form onSubmit={handleSignup} className="menu-container">
                 <h1>Signup</h1>
                 <Form.Group controlId="formUsername">
                     <Form.Label>Username</Form.Label>
                     <Form.Control
-                        type="text"
+                        type="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         onFocus={(e) => {
@@ -81,6 +89,9 @@ export default function LoginView({ setCurrentView }) {
                 {error && <p className="error-text">{error}</p>}
                 <Button id="signup" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
                     Signup
+                </Button>
+                <Button id="signup" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleBack}>
+                    Back
                 </Button>
             </Form>
         </div>
