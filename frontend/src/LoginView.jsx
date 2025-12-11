@@ -9,7 +9,11 @@ export default function LoginView({ setCurrentView }) {
     async function handleLogin(event) {
         event.preventDefault();
         const loginButton = document.getElementById("login");
+        const signupButton = document.getElementById("signup1");
+        const guestButton = document.getElementById("guest");
         loginButton.disabled = true;
+        signupButton.disabled = true;
+        guestButton.disabled = true;
 
         const inputs = document.querySelectorAll("input");
         inputs.forEach(input => input.disabled = true);
@@ -31,6 +35,8 @@ export default function LoginView({ setCurrentView }) {
             }
             
             loginButton.disabled = false;
+            signupButton.disabled = false;
+            guestButton.disabled = false;
             inputs.forEach(input => input.disabled = false);
             
             // Store token and navigate to home
@@ -94,7 +100,7 @@ export default function LoginView({ setCurrentView }) {
                 <Button id="login" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleLogin}>
                     Login
                 </Button>
-                <Button id="signup"style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
+                <Button id="signup1"style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
                     Signup
                 </Button>
                 <Button id="guest" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleGuestPlay}>

@@ -8,7 +8,9 @@ export default function LoginView({ setCurrentView }) {
 
     const handleSignup = async (event) => {
         event.preventDefault();
-        const signupButton = document.getElementById("signup");
+        const signupButton = document.getElementById("signup2");
+        const backButton = document.getElementById("back");
+        backButton.disabled = true;
         signupButton.disabled = true;
 
         const inputs = document.querySelectorAll("input");
@@ -33,6 +35,7 @@ export default function LoginView({ setCurrentView }) {
             }
 
             signupButton.disabled = false;
+            backButton.disabled = false;
             inputs.forEach(input => input.disabled = false);
 
             localStorage.setItem("token", data.token);
@@ -87,10 +90,10 @@ export default function LoginView({ setCurrentView }) {
                     />
                 </Form.Group>
                 {error && <p className="error-text">{error}</p>}
-                <Button id="signup" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
+                <Button id="signup2" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
                     Signup
                 </Button>
-                <Button id="signup" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleBack}>
+                <Button id="back" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleBack}>
                     Back
                 </Button>
             </Form>
