@@ -26,7 +26,7 @@ function CardComponent({ cardText, hidden = false }) {
         <div className="card" style={styleObject}>
             {hidden && (
                 <img
-                    src="./assets/card_back.jpg"
+                    src="/frontend/src/assets/card_back.jpg"
                     alt="Card_back"
                     style={{ fontSize: "10px", width: "100%", height: "100%" }}
                 />
