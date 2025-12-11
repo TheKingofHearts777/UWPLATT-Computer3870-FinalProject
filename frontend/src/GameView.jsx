@@ -3,6 +3,8 @@ import { Button } from "react-bootstrap";
 
 import { nextPhase, fold } from "./logic/engine.js";
 
+import {cardBackImage} from "../assets/card-back.jpg";
+
 function PauseMenu({ resumeGame, setViewToHome }) {
     return (
         <div className="pause-menu-overlay">
@@ -26,7 +28,7 @@ function CardComponent({ cardText, hidden = false }) {
         <div className="card" style={styleObject}>
             {hidden && (
                 <img
-                    src="/frontend/src/assets/card_back.jpg"
+                    src={cardBackImage}
                     alt="Card_back"
                     style={{ fontSize: "10px", width: "100%", height: "100%" }}
                 />
