@@ -3,7 +3,7 @@ import { Button } from "react-bootstrap";
 
 import { nextPhase, fold } from "./logic/engine.js";
 
-import {cardBackImage} from "../assets/card-back.jpg";
+import cardBackImage from "../assets/card-back.jpg";
 
 function PauseMenu({ resumeGame, setViewToHome }) {
     return (
