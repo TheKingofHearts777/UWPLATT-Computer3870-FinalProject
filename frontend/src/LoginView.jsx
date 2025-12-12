@@ -29,15 +29,15 @@ export default function LoginView({ setCurrentView }) {
 
             const data = await response.json();
 
-            if (!response.ok) {
-                setError(data.error || "Login failed");
-                return;
-            }
-            
             loginButton.disabled = false;
             signupButton.disabled = false;
             guestButton.disabled = false;
             inputs.forEach(input => input.disabled = false);
+
+            if (!response.ok) {
+                setError(data.error || "Login failed");
+                return;
+            }
             
             // Store token and navigate to home
             localStorage.setItem("token", data.token);

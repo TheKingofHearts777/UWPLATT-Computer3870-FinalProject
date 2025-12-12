@@ -29,14 +29,14 @@ export default function LoginView({ setCurrentView }) {
 
             const data = await response.json();
 
+            signupButton.disabled = false;
+            backButton.disabled = false;
+            inputs.forEach(input => input.disabled = false);
+
             if (!response.ok) {
                 setError(data.error);
                 return;
             }
-
-            signupButton.disabled = false;
-            backButton.disabled = false;
-            inputs.forEach(input => input.disabled = false);
 
             localStorage.setItem("token", data.token);
             setCurrentView("login");
