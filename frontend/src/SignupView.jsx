@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Container, Form } from "react-bootstrap";
 
 export default function LoginView({ setCurrentView }) {
     const [username, setUsername] = useState("");
@@ -89,13 +89,17 @@ export default function LoginView({ setCurrentView }) {
                         required
                     />
                 </Form.Group>
+
                 {error && <p className="error-text">{error}</p>}
-                <Button id="signup2" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleSignup}>
-                    Signup
-                </Button>
-                <Button id="back" style={{backgroundColor: "green", borderColor: "green", margin: "10px"}} type="submit" onClick={handleBack}>
-                    Back
-                </Button>
+
+                <Container fluid={true} className="d-flex justify-content-evenly gap-3">
+                    <Button id="signup2" className="menu-btn" type="submit" onClick={handleSignup}>
+                        Signup
+                    </Button>
+                    <Button id="back" className="menu-btn" type="submit" onClick={handleBack}>
+                        Back
+                    </Button>
+                </Container>
             </Form>
         </div>
     );

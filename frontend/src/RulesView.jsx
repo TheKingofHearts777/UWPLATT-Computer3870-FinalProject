@@ -2,7 +2,7 @@ import { Button } from "react-bootstrap";
 
 function RulesView({ setViewToHome }) {
     return (
-        <div className="menu-container">
+        <div className="menu-container d-flex h-auto">
             <h1>Rules</h1>
             <h2>Here are the rules of Texas Hold 'Em Poker:</h2>
 

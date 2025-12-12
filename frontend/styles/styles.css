@@ -25,14 +25,26 @@ body {
     color: #fff;
 }
 
+.player-hand {
+    display: flex;             /* horizontal row */
+    flex-direction: row;       /* default, optional */
+    justify-content: center;   /* center cards horizontally */
+    align-items: center;       /* align cards vertically */
+    gap: 4px;                  /* space between cards */
+    flex-wrap: nowrap;         /* keep all cards in one row */
+}
+
 .grid-players {
     display: grid;
-    grid-template-rows: repeat(3, 1fr);
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-auto-rows: minmax(60px, auto);
     width: 100%;
-    max-width: 800px;
+    max-width: 100%;
     margin: 1.5rem auto 0;
+    gap: 8px;              /* spacing between cells */
     position: relative;
+    justify-items: center;  /* center players in each cell */
+    align-items: center;    /* vertical alignment */
 }
 
 .board-center {
@@ -93,31 +105,45 @@ input[type="text"] {
 
 .menu-container {
     background: rgba(2, 29, 9, 0.7);
-    padding: 32px 48px;
     border-radius: 16px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     text-align: center;
     z-index: 1001;
+    max-height: 80vh;
+    padding: clamp(8px, 4vh, 32px) clamp(8px, 5vw, 32px);
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;        /* stretch children to fill container width */
+    gap: 2px;                   /* spacing between heading and buttons */
+}
+
+@media (max-width: 576px) {
+    .menu-container {
+        padding: 16px 24px;
+    }
 }
 
 h1 {
-    margin-bottom: 24px;
+    margin-bottom: auto;
     font-size: 2.5em;
     letter-spacing: 2px;
 }
 
 .menu-btn {
-    display: block;
-    width: 220px;
-    margin: 12px auto;
-    padding: 12px 0;
-    font-size: 1.2em;
-    background: #246d28;
-    color: #fff;
+    flex: 1;                     /* expand to fill available width */
+    min-width: 0;                 /* allow shrinking on small screens */
+    text-align: center;
     border: none;
     border-radius: 8px;
     cursor: pointer;
+    background: #246d28;
+    color: #fff;
     transition: background 0.2s;
+    padding: auto 0;              /* vertical padding */
+    font-size: 1.1em;
+    margin: auto 0;                /* vertical spacing between buttons */
+    white-space: nowrap;           /* prevent text wrap */
 }
 
 .menu-btn:hover {
@@ -148,7 +174,7 @@ h1 {
 
 .settings-list {
     text-align: center;
-    margin: 16px 0;
+    margin: 2px 0;
     padding: 0;
     width: 100%;
     max-width: 300px;

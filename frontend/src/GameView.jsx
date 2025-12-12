@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
 
 import { nextPhase, fold } from "./logic/engine.js";
 
@@ -11,7 +11,6 @@ function PauseMenu({ resumeGame, setViewToHome }) {
             <div className="menu-container">
                 <h2>Game Paused</h2>
                 <Button className="menu-btn" onClick={resumeGame}>Resume Game</Button>
-                {/* Settings button */}
                 <Button className="menu-btn" onClick={setViewToHome}>Return to Main Menu</Button>
             </div>
         </div>
@@ -43,10 +42,9 @@ function PlayerHand({ player, name, id, position }) {
     const seatClass = `player-seat pos-${position || "center"}`;
 
     return (
-        <div className={seatClass} data-player-id={id}>
-            <h3>
-                {name} {player.isDealer && "(Dealer)"}{" "}
-                {player.folded && "(Folded)"}
+        <div className={seatClass} data-player-id={id} style={{ width: "auto" }}>
+            <h3 style={{ whiteSpace: "nowrap" }}>
+                {name + (player.isDealer ? " (Dealer)" : "") + (player.folded ? " (Folded)" : "")}
             </h3>
             <div className="player-hand">
                 {player.hand.map((card) => (
@@ -117,15 +115,14 @@ function TableArea({ game, setGame }) {
     }
 
     function FoldButton() {
+        const displayStyle = game.phase !== 4 && !humanPlayer.folded ? "inline-block" : "none";
+
         return (
             <Button
                 className="menu-btn"
                 id="foldBtn"
                 style={{
-                    display:
-                        game.phase !== 4 && !humanPlayer.folded
-                            ? "inline-block"
-                            : "none",
+                    "display": displayStyle
                 }}
                 onClick={() => setGame((prev) => fold(prev))}
             >
@@ -160,7 +157,7 @@ function TableArea({ game, setGame }) {
     });
 
     return (
-        <div id="table-area">
+        <Container id="table-area">
             <h2 id="title">Player vs Computer(s)</h2>
 
             <div className="grid-players">
@@ -178,13 +175,13 @@ function TableArea({ game, setGame }) {
                 {playerHands}
             </div>
 
-            <div id="controls">
+            <div id="controls" className="d-flex flex-column flex-md-row justify-content-center gap-2">
                 <NextPhaseButton />
                 <FoldButton />
             </div>
 
             <p id="status">{game.message}</p>
-        </div>
+        </Container>
     );
 
 }

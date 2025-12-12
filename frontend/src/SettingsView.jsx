@@ -45,7 +45,7 @@ function SettingsView({ setViewToHome, settings, setSettings }) {
 
     function createDropdown(setting, settingKey) {
         return (
-            <div className="align-items-center gap-3 mb-3">
+            <div className="align-items-center mb-2">
                 <Form.Label htmlFor={settingKey} style={{ margin: 0 }}>
                     {setting.label}: {setting.values[settings[settingKey]]}
                 </Form.Label>
@@ -70,7 +70,7 @@ function SettingsView({ setViewToHome, settings, setSettings }) {
 
     function createSlider(setting, settingKey) {
         return (
-            <div className="align-items-center gap-3 mb-3">
+            <div className="align-items-center">
                 <Form.Label htmlFor={settingKey} style={{ margin: 0 }}>
                     {setting.label}: {settings[settingKey]}
                 </Form.Label>

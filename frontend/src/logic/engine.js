@@ -635,17 +635,6 @@ export function fold(origState) {
         }
     }
 
-    // all players excluding human who folded (generalize this to any player folding)
-    // let otherPlayers = state.players.filter((player) => !player.isHuman);
-
-    // state.message = `You folded. ${compareHands(state.boardCards, otherPlayers)}`;
-    // state.phase = 4;
-
-    // show hands of all players
-    // for (let player of otherPlayers) {
-    //     player.hideHand = false;
-    // }
-
     return state;
 }
 
